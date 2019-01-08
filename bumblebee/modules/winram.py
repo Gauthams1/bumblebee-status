@@ -24,6 +24,7 @@ class Module(bumblebee.engine.Module):
         widget.set("theme.minwidth", self._format.format(10.0-10e-20))
         self._utilization = "nothing"
         self._range = "Mb"
+        self._cpu=0
         engine.input.register_callback(self, button=bumblebee.input.LEFT_MOUSE,
                                        cmd="gnome-system-monitor")
 
@@ -32,14 +33,17 @@ class Module(bumblebee.engine.Module):
         return self.parameter("format", "{:.01f}Gb")
 
     def utilization(self, _):
-        return self.parameter("format", "{:.01f} {} {} ").format(self._utilization,self._range,i3ipc.Connection().get_tree().find_focused().window_class)
+        return self.parameter("format", "{:.01f} {} {:.1f} {} ").format(self._utilization,self._range,self._cpu,i3ipc.Connection().get_tree().find_focused().window_class)
 
     def update(self, widgets):
         ls=0
+        cs=0
         updateparam=i3ipc.Connection().get_tree().find_focused().window_class
-        for p in psutil.process_iter(attrs=['name','memory_info']):
+        for p in psutil.process_iter(attrs=['name','memory_info','cpu_percent']):
             if (updateparam.lower().find(p.info['name']) != -1):
                 ls+=(p.info['memory_info'].rss)
+                cs+=(p.info['cpu_percent'])
+        self._cpu=cs
         if ls/(1024*1024) < 1024:        
             self._utilization = ls/(1024*1024)
             self._range = "Mb"
