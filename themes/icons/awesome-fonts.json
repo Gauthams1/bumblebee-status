@@ -12,6 +12,7 @@
 	"dnf": { "prefix": "" },
 	"pacman": { "prefix": "" },
 	"brightness": { "prefix": "" },
+	"winram": { "prefix": "" },
 	"load": { "prefix": "" },
 	"layout": { "prefix": "" },
 	"layout-xkb": { "prefix": "" },
