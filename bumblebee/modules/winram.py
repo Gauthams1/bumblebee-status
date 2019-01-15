@@ -33,7 +33,7 @@ class Module(bumblebee.engine.Module):
         return self.parameter("format", "{:.01f}Gb")
 
     def utilization(self, _):
-        return self.parameter("format", "{:.01f} {} {:.1f} {} ").format(self._utilization,self._range,self._cpu,i3ipc.Connection().get_tree().find_focused().window_class)
+        return self.parameter("format", "{:.01f} {} {:02.01f}% {} ").format(self._utilization,self._range,self._cpu,i3ipc.Connection().get_tree().find_focused().window_class)
 
     def update(self, widgets):
         ls=0
@@ -42,7 +42,7 @@ class Module(bumblebee.engine.Module):
         for p in psutil.process_iter(attrs=['name','memory_info','cpu_percent']):
             if (updateparam.lower().find(p.info['name']) != -1):
                 ls+=(p.info['memory_info'].rss)
-                cs+=(p.info['cpu_percent'])
+                cs+=(p.info['cpu_percent'])/4
         self._cpu=cs
         if ls/(1024*1024) < 1024:        
             self._utilization = ls/(1024*1024)

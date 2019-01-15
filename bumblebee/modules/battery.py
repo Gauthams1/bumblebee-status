@@ -16,7 +16,7 @@ import bumblebee.input
 import bumblebee.output
 import bumblebee.engine
 import bumblebee.util
-
+import psutil
 try:
     import power
 except ImportError:
@@ -60,9 +60,12 @@ class Module(bumblebee.engine.Module):
             if estimate == power.common.TIME_REMAINING_UNKNOWN:
                 return ""
         except Exception:
-            return ""
-        return bumblebee.util.durationfmt(estimate*60, shorten=True, suffix=True) # estimate is in minutes
-
+            return self.secs2hours()
+        return bumblebee.util.durationfmt(estimate, shorten=True, suffix=True) # estimate is in minutes
+    def secs2hours(self):
+        mm, ss = divmod(psutil.sensors_battery().secsleft, 60)
+        hh, mm = divmod(mm, 60)
+        return "(%d:%02d)" % (hh, mm)
     def capacity(self, widget):
         widget.set("capacity", -1)
         widget.set("ac", False)
@@ -78,10 +81,10 @@ class Module(bumblebee.engine.Module):
             return "n/a"
         capacity = capacity if capacity < 100 else 100
         widget.set("capacity", capacity)
-        output =  "{}%".format(capacity)
+        output =  "{}%".format(capacity,self.remaining())
         widget.set("theme.minwidth", "100%")
         
-        if bumblebee.util.asbool(self.parameter("showremaining", True))\
+        if bumblebee.util.asbool(self.parameter("showremaining", False))\
                 and self.getCharge(widget) == "Discharging":
             output = "{} {}".format(output, self.remaining())
 
